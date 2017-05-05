@@ -247,16 +247,18 @@
 
             function optionlistWithNone(headers) {
                 html = '<option>[None]</option>';
-                for(var h in headers) {
-                    header = headers[h];
+                stripped = strippedHeaders(headers);
+                for(var h in stripped) {
+                    header = stripped[h];
                     html = html + '<option>' + header + '</option>';
                 }
                 return html;
             }
             function optionlistWithDefault(headers, defaultValue) {
                 html = '';
-                for(var h in headers) {
-                  header = headers[h];
+                stripped = strippedHeaders(headers);
+                for(var h in stripped) {
+                  header = stripped[h];
                   if(header === defaultValue) {
                       html = html + '<option selected="selected">' + header + '</option>';
                   } else {
@@ -273,8 +275,12 @@
                 indexFilter = textFilterToIndexFilter(textFilter);
                 filteredData = applyFilter(data, indexFilter);
 
-                console.log($('#chart_type_selector').val());
-                drawBarchart(filteredData, $('#primary_column').val(), $('#secondary_column').val());
+                chart_type = $('#chart_type_selector').val();
+                if(chart_type === 'bar_chart') {
+                    drawBarchart("container", filteredData, $('#primary_column').val(), $('#secondary_column').val());
+                } else if (chart_type === 'line_graph') {
+                    drawLinechart("container", filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
+                }
             }
 
             function getTextFilter() {

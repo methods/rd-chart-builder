@@ -24,20 +24,17 @@ function barchart(container_id, title, categories, category_label, series) {
         series: series
 });}
 
-function drawBarchart(filteredData, primary_column, secondary_column) {
+function drawBarchart(container_id, filteredData, primary_column, secondary_column) {
     dataRows = _.clone(filteredData);
     headerRow = dataRows.shift();
 
-    column1 = $('#primary_column').val();
-    column2 = $('#secondary_column').val();
-
     var chartObject = null;
-    if(column2 === '[None]') {
-        chartObject = barchartObject(headerRow, dataRows, column1);
+    if(secondary_column === '[None]') {
+        chartObject = barchartObject(headerRow, dataRows, primary_column);
     } else {
-        chartObject = barchartDoubleObject(headerRow, dataRows, column1, column2);
+        chartObject = barchartDoubleObject(headerRow, dataRows, primary_column, secondary_column);
     }
-    barchart('container', 'Preview', chartObject.categories, column1, chartObject.data);
+    barchart(container_id, 'Preview', chartObject.categories, primary_column, chartObject.data);
 }
 
 function barchartObject(headerRow, dataRows, category) {
@@ -89,3 +86,65 @@ function uniqueDataInColumn(data, index) {
         return item[index]; });
     return _.uniq(values).sort();
 }
+
+
+
+function drawLinechart(container_id, filteredData, categories_column, series_column) {
+    dataRows = _.clone(filteredData);
+    headerRow = dataRows.shift();
+
+    chartObject = linechartObject(headerRow, dataRows, categories_column, series_column);
+
+    linechart(container_id, 'Preview', chartObject.categories, categories_column, chartObject.data);
+}
+
+function linechartObject(headerRow, dataRows, categories_column, series_column) {
+    valueIndex = headerRow.indexOf('Value');
+    categoryIndex = headerRow.indexOf(categories_column);
+    categories = uniqueDataInColumn(dataRows, categoryIndex);
+
+    seriesIndex = headerRow.indexOf(series_column);
+    seriesNames = uniqueDataInColumn(dataRows, seriesIndex);
+
+    chartSeries = [];
+    for(s in seriesNames) {
+        seriesName = seriesNames[s];
+        values = [];
+        for(c in categories) {
+            category = categories[c];
+            values.push(valueForCategoryAndSeries(dataRows, categoryIndex, category, seriesIndex, seriesName, valueIndex));
+        }
+        chartSeries.push({'name':seriesName, 'data':values});
+    }
+
+    return {'categories':categories, 'data': chartSeries}
+}
+
+function valueForCategoryAndSeries(dataRows, categoryIndex, categoryValue, seriesIndex, seriesValue, valueIndex) {
+    for(r in dataRows) {
+        if((dataRows[r][categoryIndex] === categoryValue) && (dataRows[r][seriesIndex] === seriesValue)) {
+            return parseFloat(dataRows[r][valueIndex]);
+        }
+    }
+    return 0;
+}
+
+function linechart(container_id, title, categories, category_label, series, units) {
+    return Highcharts.chart(container_id, {
+
+        title: {
+            text: title
+        },
+        xAxis: {
+            categories: categories,
+            title: {
+                text: category_label
+            }
+        },
+        yAxis: {
+            title: {
+                text: units
+            }
+        },
+        series: series
+    });}
