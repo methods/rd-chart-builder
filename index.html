@@ -280,6 +280,8 @@
                     drawBarchart("container", filteredData, $('#primary_column').val(), $('#secondary_column').val());
                 } else if (chart_type === 'line_graph') {
                     drawLinechart("container", filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
+                } else if (chart_type === 'component_chart') {
+                    drawComponentChart('container', filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
                 }
             }
 

@@ -148,3 +148,65 @@ function linechart(container_id, title, categories, category_label, series, unit
         },
         series: series
     });}
+
+
+function drawComponentChart(container_id, filteredData, grouping_column, series_column) {
+    dataRows = _.clone(filteredData);
+    headerRow = dataRows.shift();
+
+    chartObject = componentChartObject(headerRow, dataRows, grouping_column, series_column);
+
+    componentChart(container_id, 'Preview', chartObject.categories, grouping_column, chartObject.data);
+}
+
+function componentChartObject(headerRow, dataRows, grouping_column, series_column) {
+    valueIndex = headerRow.indexOf('Value');
+    groupingIndex = headerRow.indexOf(grouping_column);
+    groups = uniqueDataInColumn(dataRows, groupingIndex);
+
+    seriesIndex = headerRow.indexOf(series_column);
+    seriesNames = uniqueDataInColumn(dataRows, seriesIndex);
+
+    chartSeries = [];
+    for(s in seriesNames) {
+        seriesName = seriesNames[s];
+        values = [];
+        for(g in groups) {
+            group = groups[g];
+            values.push(valueForCategoryAndSeries(dataRows, groupingIndex, group, seriesIndex, seriesName, valueIndex));
+        }
+        chartSeries.push({'name':seriesName, 'data':values});
+    }
+
+    return {'categories':groups, 'data': chartSeries}
+}
+
+function componentChart(container_id, title, categories, category_label, series, units) {
+    return Highcharts.chart(container_id, {
+        chart: {
+            type:'bar'
+        },
+        title: {
+            text: title
+        },
+        xAxis: {
+            categories: categories,
+            title: {
+                text: category_label
+            }
+        },
+        yAxis: {
+            title: {
+                text: units
+            }
+        },
+        legend: {
+            reversed: true
+        },
+        plotOptions: {
+            series: {
+                stacking: 'normal'
+            }
+        },
+        series: series
+    });}
