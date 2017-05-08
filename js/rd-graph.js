@@ -2,42 +2,47 @@
  * Created by Tom.Ridd on 05/05/2017.
  */
 
-function barchart(container_id, title, categories, category_label, series) {
+function barchart(container_id, chartObject) {
     return Highcharts.chart(container_id, {
         chart: {
             type:'bar'
         },
         title: {
-            text: title
+            text: chartObject.title.text
         },
         xAxis: {
-            categories: categories,
+            categories: chartObject.xAxis.categories,
             title: {
-                text: category_label
+                text: chartObject.xAxis.title.text
             }
         },
         yAxis: {
             title: {
-                text: data.y_label
+                text: chartObject.yAxis.title.text
             }
         },
-        series: series
-});}
+        series: chartObject.series
+    });}
 
 function drawBarchart(container_id, filteredData, primary_column, secondary_column) {
+
+    var chartObject = barchartObject(filteredData, primary_column, secondary_column);
+
+    barchart(container_id, chartObject);
+}
+
+function barchartObject(filteredData, primary_column, secondary_column) {
     dataRows = _.clone(filteredData);
     headerRow = dataRows.shift();
 
-    var chartObject = null;
     if(secondary_column === '[None]') {
-        chartObject = barchartObject(headerRow, dataRows, primary_column);
+        return barchartSingleObject(headerRow, dataRows, primary_column);
     } else {
-        chartObject = barchartDoubleObject(headerRow, dataRows, primary_column, secondary_column);
+        return barchartDoubleObject(headerRow, dataRows, primary_column, secondary_column);
     }
-    barchart(container_id, 'Preview', chartObject.categories, primary_column, chartObject.data);
 }
 
-function barchartObject(headerRow, dataRows, category) {
+function barchartSingleObject(headerRow, dataRows, category) {
     valueIndex = headerRow.indexOf('Value');
     categoryIndex = headerRow.indexOf(category);
     categories = uniqueDataInColumn(dataRows, categoryIndex);
@@ -47,7 +52,12 @@ function barchartObject(headerRow, dataRows, category) {
         values.push(valueForCategory(dataRows, categoryIndex, valueIndex, categories[c]));
     }
 
-    return {'categories':categories, 'data': [{'name':category, 'data': values}]}
+    return {
+        'type':'bar',
+        'title':{'text':'Bar Chart'},
+        'xAxis':{'title':{'text':category}, 'categories':categories},
+        'yAxis':{'title':{'text':'Percentage'}},
+        'series': [{'name':category, 'data': values}]}
 }
 
 function valueForCategory(dataRows, categoryIndex, valueIndex, categoryValue) {
@@ -58,7 +68,6 @@ function valueForCategory(dataRows, categoryIndex, valueIndex, categoryValue) {
     }
     return 0;
 }
-
 
 function barchartDoubleObject(headerRow, dataRows, category1, category2) {
     valueIndex = headerRow.indexOf('Value');
@@ -78,7 +87,12 @@ function barchartDoubleObject(headerRow, dataRows, category1, category2) {
         seriesData.push({'name':series[s], 'data': values});
     }
 
-    return {'categories':categories, 'data': seriesData};
+    return {
+        'type':'bar',
+        'title':{'text':'Double bar Chart'},
+        'xAxis':{'title':{'text':category1}, 'categories':categories},
+        'yAxis':{'title':{'text':'Percentage'}},
+        'series': seriesData};
 }
 
 function uniqueDataInColumn(data, index) {
@@ -86,6 +100,8 @@ function uniqueDataInColumn(data, index) {
         return item[index]; });
     return _.uniq(values).sort();
 }
+
+
 
 
 

@@ -106,6 +106,25 @@
             </form>
         </div>
 
+        <div id="table_options" class="chart-builder-section chart-option-group" style="display:none">
+            <h3>3. Table builder options</h3>
+            <form>
+                <div class="form-group">
+                    <label for="component_bar_column">Bar grouping</label>
+                    <select id="component_bar_column" class="form-control">
+                        <option>Ethnicity</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="component_component_column">Component grouping</label>
+                    <select id="component_component_column" class="form-control">
+                        <option>[None]</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+
         <div id="data_options" class="chart-builder-section" style="display:none">
             <h3>4. Filter data</h3>
             <form class="form-horizontal" id="data_form">
@@ -278,11 +297,14 @@
                 chart_type = $('#chart_type_selector').val();
                 if(chart_type === 'bar_chart') {
                     drawBarchart("container", filteredData, $('#primary_column').val(), $('#secondary_column').val());
+
                 } else if (chart_type === 'line_graph') {
                     drawLinechart("container", filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
                 } else if (chart_type === 'component_chart') {
                     drawComponentChart('container', filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
                 }
+
+                drawChart("container", chartObject);
             }
 
             function getTextFilter() {
