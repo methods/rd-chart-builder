@@ -298,16 +298,16 @@
                 filteredData = filterData(data, filter);
 
                 chart_type = $('#chart_type_selector').val();
+                var chartObject = null;
                 if(chart_type === 'bar_chart') {
                     chartObject = barchartObject(filteredData, $('#primary_column').val(), $('#secondary_column').val());
-                    barchart("container", chartObject);
-
                 } else if (chart_type === 'line_graph') {
-                    drawLinechart("container", filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
+                    chartObject = linechartObject(filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
                 } else if (chart_type === 'component_chart') {
-                    drawComponentChart('container', filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
+                    chartObject = componentChartObject(filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
                 }
 
+                drawChart('container', chartObject);
             }
 
             function getTextFilter() {

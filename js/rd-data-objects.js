@@ -72,3 +72,80 @@ function uniqueDataInColumn(data, index) {
         return item[index]; });
     return _.uniq(values).sort();
 }
+
+
+
+
+
+function linechartObject(filteredData, categories_column, series_column) {
+    dataRows = _.clone(filteredData);
+    headerRow = dataRows.shift();
+
+    valueIndex = headerRow.indexOf('Value');
+    categoryIndex = headerRow.indexOf(categories_column);
+    categories = uniqueDataInColumn(dataRows, categoryIndex);
+
+    seriesIndex = headerRow.indexOf(series_column);
+    seriesNames = uniqueDataInColumn(dataRows, seriesIndex);
+
+    chartSeries = [];
+    for(s in seriesNames) {
+        seriesName = seriesNames[s];
+        values = [];
+        for(c in categories) {
+            category = categories[c];
+            values.push(valueForCategoryAndSeries(dataRows, categoryIndex, category, seriesIndex, seriesName, valueIndex));
+        }
+        chartSeries.push({'name':seriesName, 'data':values});
+    }
+
+    return {
+        'type':'line',
+        'title':{'text':'Line Chart'},
+        'xAxis':{'title':{'text':categories_column}, 'categories':categories},
+        'yAxis':{'title':{'text':'Percentage'}},
+        'series': chartSeries};
+}
+
+function valueForCategoryAndSeries(dataRows, categoryIndex, categoryValue, seriesIndex, seriesValue, valueIndex) {
+    for(r in dataRows) {
+        if((dataRows[r][categoryIndex] === categoryValue) && (dataRows[r][seriesIndex] === seriesValue)) {
+            return parseFloat(dataRows[r][valueIndex]);
+        }
+    }
+    return 0;
+}
+
+
+
+
+
+function componentChartObject(filteredData, grouping_column, series_column) {
+    dataRows = _.clone(filteredData);
+    headerRow = dataRows.shift();
+
+    valueIndex = headerRow.indexOf('Value');
+    groupingIndex = headerRow.indexOf(grouping_column);
+    groups = uniqueDataInColumn(dataRows, groupingIndex);
+
+    seriesIndex = headerRow.indexOf(series_column);
+    seriesNames = uniqueDataInColumn(dataRows, seriesIndex);
+
+    chartSeries = [];
+    for(s in seriesNames) {
+        seriesName = seriesNames[s];
+        values = [];
+        for(g in groups) {
+            group = groups[g];
+            values.push(valueForCategoryAndSeries(dataRows, groupingIndex, group, seriesIndex, seriesName, valueIndex));
+        }
+        chartSeries.push({'name':seriesName, 'data':values});
+    }
+
+    return {
+        'type':'component',
+        'title':{'text':'Component Chart'},
+        'xAxis':{'title':{'text':grouping_column}, 'categories':groups},
+        'yAxis':{'title':{'text':'Percentage'}},
+        'series': chartSeries};
+}
