@@ -3,6 +3,8 @@
  */
 
 function drawChart(container_id, chartObject) {
+    console.log(chartObject);
+
     if(chartObject.type === 'bar') {
         return barchart(container_id, chartObject);
     } else if(chartObject.type === 'line') {
