@@ -157,7 +157,11 @@
 <script src="js/jquery.csv.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="js/underscore-min.js"></script>
+
+<script src="js/rd-data-filter.js"></script>
+<script src="js/rd-data-objects.js"></script>
 <script src="js/rd-graph.js"></script>
+
 <script type="text/javascript">
         $(document).ready(function() {
             const excluded_headers = ['Measure', 'Value', 'Numerator', 'Denominator', 'Upper bound', 'Lower bound', 'Note'];
@@ -290,13 +294,13 @@
 
             function preview(evt) {
 
-                textFilter = getTextFilter();
-                indexFilter = textFilterToIndexFilter(textFilter);
-                filteredData = applyFilter(data, indexFilter);
+                filter = getTextFilter();
+                filteredData = filterData(data, filter);
 
                 chart_type = $('#chart_type_selector').val();
                 if(chart_type === 'bar_chart') {
-                    drawBarchart("container", filteredData, $('#primary_column').val(), $('#secondary_column').val());
+                    chartObject = barchartObject(filteredData, $('#primary_column').val(), $('#secondary_column').val());
+                    barchart("container", chartObject);
 
                 } else if (chart_type === 'line_graph') {
                     drawLinechart("container", filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
@@ -304,7 +308,6 @@
                     drawComponentChart('container', filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
                 }
 
-                drawChart("container", chartObject);
             }
 
             function getTextFilter() {
