@@ -3,8 +3,8 @@
  */
 
 
-function barchartObject(filteredData, primary_column, secondary_column) {
-    dataRows = _.clone(filteredData);
+function barchartObject(data, primary_column, secondary_column) {
+    dataRows = _.clone(data);
     headerRow = dataRows.shift();
 
     if(secondary_column === '[None]') {
@@ -74,8 +74,8 @@ function uniqueDataInColumn(data, index) {
 }
 
 
-function linechartObject(filteredData, categories_column, series_column) {
-    dataRows = _.clone(filteredData);
+function linechartObject(data, categories_column, series_column) {
+    dataRows = _.clone(data);
     headerRow = dataRows.shift();
 
     valueIndex = headerRow.indexOf('Value');
@@ -117,8 +117,8 @@ function valueForCategoryAndSeries(dataRows, categoryIndex, categoryValue, serie
 
 
 
-function componentChartObject(filteredData, grouping_column, series_column) {
-    dataRows = _.clone(filteredData);
+function componentChartObject(data, grouping_column, series_column) {
+    dataRows = _.clone(data);
     headerRow = dataRows.shift();
 
     valueIndex = headerRow.indexOf('Value');
@@ -148,9 +148,17 @@ function componentChartObject(filteredData, grouping_column, series_column) {
 }
 
 
+function simpleTableObject(data, row_column, group_column, data_columns) {
 
-function simpleTable(filteredData, category_column, data_columns) {
-    var dataRows = _.clone(filteredData);
+    if(secondary_column === '[None]') {
+        return simpleTable(data, row_column, data_columns);
+    } else {
+        return groupedTable(data, row_column, group_column, data_columns);
+    }
+}
+
+function simpleTable(data, category_column, data_columns) {
+    var dataRows = _.clone(data);
     var headerRow = dataRows.shift();
 
     var columnIndex = headerRow.indexOf(category_column);
@@ -168,8 +176,8 @@ function simpleTable(filteredData, category_column, data_columns) {
         'data': data};
 }
 
-function groupedTable(filteredData, category_column, group_column, data_columns) {
-    var dataRows = _.clone(filteredData);
+function groupedTable(data, category_column, group_column, data_columns) {
+    var dataRows = _.clone(data);
     var headerRow = dataRows.shift();
 
     var columnIndex = headerRow.indexOf(category_column);
@@ -179,11 +187,11 @@ function groupedTable(filteredData, category_column, group_column, data_columns)
     var group_values = uniqueDataInColumn(dataRows, group_column_index);
 
     var group_series = _.map(group_values, function(group) {
-        var group_data = _.filter(filteredData, function(item) { return item[group_column_index] === group;});
-        var data = _.map(group_data, function(item) {
-            return _.map(data_column_indices, function(i) { return item[i]})
+        var group_data = _.filter(data, function(item) { return item[group_column_index] === group;});
+        var group_data_items = _.map(group_data, function(item) {
+            return {'category':item[columnIndex], 'values':_.map(data_column_indices, function(i) { return item[i]})}
         });
-        return {'group':group, 'data':data};
+        return {'group':group, 'data':group_data_items};
     });
 
     return {

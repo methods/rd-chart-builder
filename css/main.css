@@ -14,3 +14,7 @@
     /*background-color: dodgerblue;*/
     margin: 10px 0 20px 0;
 }
+
+#data_text_area {
+    white-space: nowrap;
+}

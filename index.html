@@ -37,9 +37,16 @@
     <div class="row">
     <!--Options-->
     <div class="col-4">
-        <div id="file_upload" class="chart-builder-section">
-            <h3>1. Select data file</h3>
-            <div><input class="btn btn-primary btn-file" type="file" id="txtFileUpload" value="Input"></div>
+
+        <div id="tab_seperated_content" class = "chart-builder-section">
+            <h3>1. Copy data from excel</h3>
+            <div>
+                <form>
+                    <div class="form-group">
+                        <textarea class="form-control" id="data_text_area" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div id="select_chart_type" class="chart-builder-section" style="display:none">
@@ -142,39 +149,39 @@
         </div>
 
         <div id="preview_section" class="chart-builder-section" style="display:none">
-            <h3>5. Generate chart</h3>
+            <h3>4. Generate chart</h3>
             <div>
                 <button class="btn btn-primary" id="preview">Preview</button>
             </div>
         </div>
     </div>
     <div class="col-8">
-        <div class="row" id="example-block">
-            <div class="col-12">
-                <div class="card example-card">
-                    <div class="card-block">
-                        <h4 class="card-title" id="example-title-1">Preview</h4>
-                        <h6 class="card-subtitle mb-2 text-muted" id="tutorial-title">This area for a title for this tutorial</h6>
-                        <p class="card-text" id="tutorial-text">Some explanation text here as a tutorial for people trying to work out how to use the dataset.</p>
-                        <div class="row"><div class="col-8"><a href="#" class="card-link">Download</a>
-                        <a href="#" class="card-link">Quickload</a></div>
-                        <div class="col-4"><a href="#" class="card-link" id="hide-example-button">hide</a></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row" id="example-title-only-block"  style="display:none">
-            <div class="col-12">
-                <div class="card example-card">
-                    <div class="card-block">
-                        <div class="row">
-                            <div class="col-8"><h4 class="card-title" id="example-title-2">Preview</h4></div>
-                            <div class="col-4"><a href="#" class="card-link" id="show-example-button">show</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!--<div class="row" id="example-block">-->
+            <!--<div class="col-12">-->
+                <!--<div class="card example-card">-->
+                    <!--<div class="card-block">-->
+                        <!--<h4 class="card-title" id="example-title-1">Preview</h4>-->
+                        <!--<h6 class="card-subtitle mb-2 text-muted" id="tutorial-title">This area for a title for this tutorial</h6>-->
+                        <!--<p class="card-text" id="tutorial-text">Some explanation text here as a tutorial for people trying to work out how to use the dataset.</p>-->
+                        <!--<div class="row"><div class="col-8"><a href="#" class="card-link">Download</a>-->
+                        <!--<a href="#" class="card-link">Quickload</a></div>-->
+                        <!--<div class="col-4"><a href="#" class="card-link" id="hide-example-button">hide</a></div></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row" id="example-title-only-block"  style="display:none">-->
+            <!--<div class="col-12">-->
+                <!--<div class="card example-card">-->
+                    <!--<div class="card-block">-->
+                        <!--<div class="row">-->
+                            <!--<div class="col-8"><h4 class="card-title" id="example-title-2">Preview</h4></div>-->
+                            <!--<div class="col-4"><a href="#" class="card-link" id="show-example-button">show</a></div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
         <div class="row">
             <div class="col-12">
         <div id="container" class="chart-container" style="height: 600px"></div>
@@ -201,9 +208,7 @@
                 'Upper confidence interval', 'Lower confidence interval',
                 'Note', 'Notes'];
 
-            // The event listener for the file upload
-            document.getElementById('txtFileUpload').addEventListener('change', upload, false);
-
+            document.getElementById('data_text_area').addEventListener('keyup', paste, false);
             document.getElementById('preview').addEventListener('click', preview, false);
 
             data = null;
@@ -253,6 +258,7 @@
 
                         // read data
                         data = $.csv.toArrays(csvData);
+                        console.log(data);
 
                         // get the headers
                         headers = data[0];
@@ -269,6 +275,24 @@
                     };
                 }
             }
+
+            function paste(evt) {
+
+                    var csvData = $("#data_text_area").val();
+
+                    // read data
+                    data = _.map(csvData.split('\n'), function(line) { return line.split('\t')});
+
+                    // get the headers
+                    headers = data[0];
+//
+//                    //
+//                    populateDataFilter(headers, data);
+
+                    populateChartOptions(headers);
+
+                    $('#select_chart_type').show();
+                }
 
             function strippedHeaders(headers) {
                 exclude = ['Measure', 'Value', 'Numerator', 'Denominator',
@@ -336,73 +360,74 @@
 
             function preview(evt) {
 
-                filter = getTextFilter();
-                filteredData = filterData(data, filter);
+//                filter = getTextFilter();
+//                filteredData = filterData(data, filter);
 
                 chart_type = $('#chart_type_selector').val();
                 var chartObject = null;
                 var tableObject = null;
                 if(chart_type === 'bar_chart') {
-                    chartObject = barchartObject(filteredData, $('#primary_column').val(), $('#secondary_column').val());
+                    chartObject = barchartObject(data, $('#primary_column').val(), $('#secondary_column').val());
                 } else if (chart_type === 'line_graph') {
-                    chartObject = linechartObject(filteredData, $('#x_axis_column').val(), $('#line_series_column').val());
+                    chartObject = linechartObject(data, $('#x_axis_column').val(), $('#line_series_column').val());
                 } else if (chart_type === 'component_chart') {
-                    chartObject = componentChartObject(filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
+                    chartObject = componentChartObject(data, $('#component_bar_column').val(), $('#component_component_column').val());
+                } else if (chart_type === 'table') {
+                    tableObject = simpleTableObject(data, $('#table_category_column').val(), $('#table_category_column').val(), ['Value', 'Denominator'])
                 }
 
-                console.log(tableObject);
-                drawChart('container', chartObject);
+                if(chartObject) { drawChart('container', chartObject); }
             }
-
-            function getTextFilter() {
-                filter = {}
-                headers = strippedHeaders(data[0]);
-                for(var i=1; i<=headers.length; i++) {
-                    value = $('#data_field_' + i).val();
-                    if(value !== '[No filter]') {
-                        filter[headers[i - 1]] = value;
-                    }
-                }
-                return filter;
-            }
-
-            function textFilterToIndexFilter(textFilter) {
-                indexFilter = {};
-                headers = data[0];
-
-                for(key in textFilter) {
-                    i = headers.indexOf(key);
-                    indexFilter[i] = textFilter[key];
-                }
-
-                return indexFilter;
-            }
-
-            function applyFilter(data, indexFilter){
-                data2 = _.clone(data);
-
-                headerRow = data2.shift();
-                filteredRows = [];
-
-                for(d in data2) {
-                    datum = data2[d];
-                    if(itemPassesFilter(datum, indexFilter)) {
-                        filteredRows.push(datum);
-                    }
-                }
-
-                filteredRows.unshift(headerRow);
-                return filteredRows;
-            }
-
-            function itemPassesFilter(item, filter) {
-                for(index in filter) {
-                    if (item[index] !== filter[index]) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+//
+//            function getTextFilter() {
+//                filter = {}
+//                headers = strippedHeaders(data[0]);
+//                for(var i=1; i<=headers.length; i++) {
+//                    value = $('#data_field_' + i).val();
+//                    if(value !== '[No filter]') {
+//                        filter[headers[i - 1]] = value;
+//                    }
+//                }
+//                return filter;
+//            }
+//
+//            function textFilterToIndexFilter(textFilter) {
+//                indexFilter = {};
+//                headers = data[0];
+//
+//                for(key in textFilter) {
+//                    i = headers.indexOf(key);
+//                    indexFilter[i] = textFilter[key];
+//                }
+//
+//                return indexFilter;
+//            }
+//
+//            function applyFilter(data, indexFilter){
+//                data2 = _.clone(data);
+//
+//                headerRow = data2.shift();
+//                filteredRows = [];
+//
+//                for(d in data2) {
+//                    datum = data2[d];
+//                    if(itemPassesFilter(datum, indexFilter)) {
+//                        filteredRows.push(datum);
+//                    }
+//                }
+//
+//                filteredRows.unshift(headerRow);
+//                return filteredRows;
+//            }
+//
+//            function itemPassesFilter(item, filter) {
+//                for(index in filter) {
+//                    if (item[index] !== filter[index]) {
+//                        return false;
+//                    }
+//                }
+//                return true;
+//            }
         });
 </script>
 <script>
@@ -410,7 +435,7 @@
         $('#chart_type_selector').change(function(){
             $('.chart-option-group').hide();
             $('#' + $(this).val() + "_options").show();
-            $('#data_options').show();
+            // $('#data_options').show();
             $('#preview_section').show();
         });
     });
