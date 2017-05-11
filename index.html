@@ -31,6 +31,8 @@
 
 </nav>
 
+
+
 <div class="container">
     <div class="row">
     <!--Options-->
@@ -48,6 +50,7 @@
                     <option value="line_graph">Line graph</option>
                     <option value="bar_chart">Bar chart</option>
                     <option value="component_chart">Component chart</option>
+                    <option value="table">Table</option>
                 </select>
             </div>
         </div>
@@ -110,19 +113,20 @@
             <h3>3. Table builder options</h3>
             <form>
                 <div class="form-group">
-                    <label for="component_bar_column">Bar grouping</label>
-                    <select id="component_bar_column" class="form-control">
+                    <label for="table_category_column">Rows</label>
+                    <select id="table_category_column" class="form-control">
                         <option>Ethnicity</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="component_component_column">Component grouping</label>
-                    <select id="component_component_column" class="form-control">
+                    <label for="table_group_column">Grouping</label>
+                    <select id="table_group_column" class="form-control">
                         <option>[None]</option>
                     </select>
                 </div>
             </form>
         </div>
+
 
 
         <div id="data_options" class="chart-builder-section" style="display:none">
@@ -145,8 +149,36 @@
         </div>
     </div>
     <div class="col-8">
-        <h3>Preview</h3>
+        <div class="row" id="example-block">
+            <div class="col-12">
+                <div class="card example-card">
+                    <div class="card-block">
+                        <h4 class="card-title" id="example-title-1">Preview</h4>
+                        <h6 class="card-subtitle mb-2 text-muted" id="tutorial-title">This area for a title for this tutorial</h6>
+                        <p class="card-text" id="tutorial-text">Some explanation text here as a tutorial for people trying to work out how to use the dataset.</p>
+                        <div class="row"><div class="col-8"><a href="#" class="card-link">Download</a>
+                        <a href="#" class="card-link">Quickload</a></div>
+                        <div class="col-4"><a href="#" class="card-link" id="hide-example-button">hide</a></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="example-title-only-block"  style="display:none">
+            <div class="col-12">
+                <div class="card example-card">
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-8"><h4 class="card-title" id="example-title-2">Preview</h4></div>
+                            <div class="col-4"><a href="#" class="card-link" id="show-example-button">show</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
         <div id="container" class="chart-container" style="height: 600px"></div>
+        </div></div>
     </div>
 </div>
 </div>
@@ -158,13 +190,16 @@
 <script src="js/bootstrap.js"></script>
 <script src="js/underscore-min.js"></script>
 
-<script src="js/rd-data-filter.js"></script>
+<script src="js/rd-data-tools.js"></script>
 <script src="js/rd-data-objects.js"></script>
 <script src="js/rd-graph.js"></script>
 
 <script type="text/javascript">
         $(document).ready(function() {
-            const excluded_headers = ['Measure', 'Value', 'Numerator', 'Denominator', 'Upper bound', 'Lower bound', 'Note'];
+            const excluded_headers = exclude = ['Measure', 'Value', 'Numerator', 'Denominator',
+                'Upper bound', 'Lower bound',
+                'Upper confidence interval', 'Lower confidence interval',
+                'Note', 'Notes'];
 
             // The event listener for the file upload
             document.getElementById('txtFileUpload').addEventListener('change', upload, false);
@@ -236,7 +271,10 @@
             }
 
             function strippedHeaders(headers) {
-                exclude = ['Measure', 'Value', 'Numerator', 'Denominator', 'Upper bound', 'Lower bound', 'Note'];
+                exclude = ['Measure', 'Value', 'Numerator', 'Denominator',
+                    'Upper bound', 'Lower bound',
+                    'Upper confidence interval', 'Lower confidence interval',
+                    'Note', 'Notes'];
                 stripped = [];
                 for(h in headers) {
                     header = headers[h];
@@ -266,6 +304,10 @@
 
                 $('#component_bar_column').html(optionlistWithDefault(headers, 'Ethnicity'));
                 $('#component_component_column').html(optionlistWithNone(headers));
+
+                $('#table_category_column').html(optionlistWithDefault(headers, 'Ethnicity'));
+                $('#table_group_column').html(optionlistWithNone(headers));
+
             }
 
             function optionlistWithNone(headers) {
@@ -299,6 +341,7 @@
 
                 chart_type = $('#chart_type_selector').val();
                 var chartObject = null;
+                var tableObject = null;
                 if(chart_type === 'bar_chart') {
                     chartObject = barchartObject(filteredData, $('#primary_column').val(), $('#secondary_column').val());
                 } else if (chart_type === 'line_graph') {
@@ -307,6 +350,7 @@
                     chartObject = componentChartObject(filteredData, $('#component_bar_column').val(), $('#component_component_column').val());
                 }
 
+                console.log(tableObject);
                 drawChart('container', chartObject);
             }
 
@@ -369,6 +413,16 @@
             $('#data_options').show();
             $('#preview_section').show();
         });
+    });
+
+    $("#hide-example-button").click(function(){
+        $("#example-block").hide();
+        $("#example-title-only-block").show();
+    });
+
+    $("#show-example-button").click(function(){
+        $("#example-block").show();
+        $("#example-title-only-block").hide();
     });
 </script>
 </body>

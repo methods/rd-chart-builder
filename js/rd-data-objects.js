@@ -68,13 +68,10 @@ function barchartDoubleObject(headerRow, dataRows, category1, category2) {
 }
 
 function uniqueDataInColumn(data, index) {
-    values = _.map(data.slice(start = 1), function(item) {
+    values = _.map(data.slice(start = 0), function(item) {
         return item[index]; });
     return _.uniq(values).sort();
 }
-
-
-
 
 
 function linechartObject(filteredData, categories_column, series_column) {
@@ -148,4 +145,50 @@ function componentChartObject(filteredData, grouping_column, series_column) {
         'xAxis':{'title':{'text':grouping_column}, 'categories':groups},
         'yAxis':{'title':{'text':'Percentage'}},
         'series': chartSeries};
+}
+
+
+
+function simpleTable(filteredData, category_column, data_columns) {
+    var dataRows = _.clone(filteredData);
+    var headerRow = dataRows.shift();
+
+    var columnIndex = headerRow.indexOf(category_column);
+    var data_column_indices = _.map(data_columns, function(data_column) { return headerRow.indexOf(data_column); });
+
+    var data = _.map(filteredData, function(item) {
+        console.log(item);
+        return {'category':item[columnIndex],'values':_.map(data_column_indices, function(i) { return item[i]})};
+    });
+
+    return {
+        'type':'simple',
+        'title':{'text':'Simple Table'},
+        'columns': data_columns,
+        'data': data};
+}
+
+function groupedTable(filteredData, category_column, group_column, data_columns) {
+    var dataRows = _.clone(filteredData);
+    var headerRow = dataRows.shift();
+
+    var columnIndex = headerRow.indexOf(category_column);
+    var data_column_indices = _.map(data_columns, function(data_column) { return headerRow.indexOf(data_column); });
+
+    var group_column_index = headerRow.indexOf(group_column);
+    var group_values = uniqueDataInColumn(dataRows, group_column_index);
+
+    var group_series = _.map(group_values, function(group) {
+        var group_data = _.filter(filteredData, function(item) { return item[group_column_index] === group;});
+        var data = _.map(group_data, function(item) {
+            return _.map(data_column_indices, function(i) { return item[i]})
+        });
+        return {'group':group, 'data':data};
+    });
+
+    return {
+        'type':'grouped',
+        'title':{'text':'Grouped Table'},
+        'columns':data_columns,
+        'data': group_series};
 }

@@ -3,8 +3,21 @@
  */
 
 function filterData(data, filter) {
+
     indexFilter = textFilterToIndexFilter(data, filter);
     return applyFilter(data, indexFilter);
+}
+
+function numerateColumns(data, columns) {
+    _.forEach(columns, function (column) {
+        numerateColumn(data, column);
+    });
+}
+function numerateColumn(data, column) {
+    var index = data[0].indexOf(column);
+    for(row = 1; row < data.length; row++) {
+        row[index] = row[index].toFloat();
+    }
 }
 
 function textFilterToIndexFilter(data, textFilter) {
@@ -37,6 +50,8 @@ function applyFilter(data, indexFilter){
 }
 
 function itemPassesFilter(item, filter) {
+    if(item[0] === '') { return false; }
+
     for(index in filter) {
         if (item[index] !== filter[index]) {
             return false;
