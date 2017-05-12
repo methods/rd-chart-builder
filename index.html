@@ -200,6 +200,7 @@
 <script src="js/rd-data-tools.js"></script>
 <script src="js/rd-data-objects.js"></script>
 <script src="js/rd-graph.js"></script>
+<script src="js/rd-table.js"></script>
 
 <script type="text/javascript">
         $(document).ready(function() {
@@ -373,61 +374,12 @@
                 } else if (chart_type === 'component_chart') {
                     chartObject = componentChartObject(data, $('#component_bar_column').val(), $('#component_component_column').val());
                 } else if (chart_type === 'table') {
-                    tableObject = simpleTableObject(data, $('#table_category_column').val(), $('#table_category_column').val(), ['Value', 'Denominator'])
+                    tableObject = simpleTableObject(data, $('#table_category_column').val(), $('#table_group_column').val(), ['Value', 'Denominator'])
                 }
 
                 if(chartObject) { drawChart('container', chartObject); }
+                if(tableObject) { drawTable('container', tableObject); }
             }
-//
-//            function getTextFilter() {
-//                filter = {}
-//                headers = strippedHeaders(data[0]);
-//                for(var i=1; i<=headers.length; i++) {
-//                    value = $('#data_field_' + i).val();
-//                    if(value !== '[No filter]') {
-//                        filter[headers[i - 1]] = value;
-//                    }
-//                }
-//                return filter;
-//            }
-//
-//            function textFilterToIndexFilter(textFilter) {
-//                indexFilter = {};
-//                headers = data[0];
-//
-//                for(key in textFilter) {
-//                    i = headers.indexOf(key);
-//                    indexFilter[i] = textFilter[key];
-//                }
-//
-//                return indexFilter;
-//            }
-//
-//            function applyFilter(data, indexFilter){
-//                data2 = _.clone(data);
-//
-//                headerRow = data2.shift();
-//                filteredRows = [];
-//
-//                for(d in data2) {
-//                    datum = data2[d];
-//                    if(itemPassesFilter(datum, indexFilter)) {
-//                        filteredRows.push(datum);
-//                    }
-//                }
-//
-//                filteredRows.unshift(headerRow);
-//                return filteredRows;
-//            }
-//
-//            function itemPassesFilter(item, filter) {
-//                for(index in filter) {
-//                    if (item[index] !== filter[index]) {
-//                        return false;
-//                    }
-//                }
-//                return true;
-//            }
         });
 </script>
 <script>

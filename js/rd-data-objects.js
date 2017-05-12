@@ -150,7 +150,7 @@ function componentChartObject(data, grouping_column, series_column) {
 
 function simpleTableObject(data, row_column, group_column, data_columns) {
 
-    if(secondary_column === '[None]') {
+    if(group_column === '[None]') {
         return simpleTable(data, row_column, data_columns);
     } else {
         return groupedTable(data, row_column, group_column, data_columns);
@@ -164,7 +164,7 @@ function simpleTable(data, category_column, data_columns) {
     var columnIndex = headerRow.indexOf(category_column);
     var data_column_indices = _.map(data_columns, function(data_column) { return headerRow.indexOf(data_column); });
 
-    var data = _.map(filteredData, function(item) {
+    var data = _.map(dataRows, function(item) {
         console.log(item);
         return {'category':item[columnIndex],'values':_.map(data_column_indices, function(i) { return item[i]})};
     });
@@ -172,6 +172,7 @@ function simpleTable(data, category_column, data_columns) {
     return {
         'type':'simple',
         'title':{'text':'Simple Table'},
+        'category':category_column,
         'columns': data_columns,
         'data': data};
 }
@@ -187,7 +188,7 @@ function groupedTable(data, category_column, group_column, data_columns) {
     var group_values = uniqueDataInColumn(dataRows, group_column_index);
 
     var group_series = _.map(group_values, function(group) {
-        var group_data = _.filter(data, function(item) { return item[group_column_index] === group;});
+        var group_data = _.filter(dataRows, function(item) { return item[group_column_index] === group;});
         var group_data_items = _.map(group_data, function(item) {
             return {'category':item[columnIndex], 'values':_.map(data_column_indices, function(i) { return item[i]})}
         });
@@ -196,7 +197,8 @@ function groupedTable(data, category_column, group_column, data_columns) {
 
     return {
         'type':'grouped',
+        'category': category_column,
         'title':{'text':'Grouped Table'},
         'columns':data_columns,
-        'data': group_series};
+        'groups': group_series};
 }
